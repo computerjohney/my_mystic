@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.computerjohney.my_mystic.GdxGame;
 import com.computerjohney.my_mystic.Main;
 
 /** Launches the Android application. */

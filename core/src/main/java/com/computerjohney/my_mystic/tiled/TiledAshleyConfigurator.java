@@ -1,0 +1,113 @@
+package com.computerjohney.my_mystic.tiled;
+
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.FileTextureData;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.World;
+import com.computerjohney.my_mystic.GdxGame;
+import com.computerjohney.my_mystic.asset.AssetService;
+import com.computerjohney.my_mystic.component.Graphic;
+import com.computerjohney.my_mystic.component.Transform;
+
+public class TiledAshleyConfigurator {
+
+    private static final Vector2 DEFAULT_PHYSIC_SCALING = new Vector2(1f, 1f);
+
+    private final Engine engine;
+    //private final World physicWorld;
+    private final MapObjects tmpMapObjects;
+    private final Vector2 tmpVec2;
+    private final AssetService assetService;
+
+    public TiledAshleyConfigurator(Engine engine, AssetService assetService) {
+        this.engine = engine;
+        //this.physicWorld = physicWorld;
+        this.tmpMapObjects = new MapObjects();
+        this.tmpVec2 = new Vector2();
+        this.assetService = assetService;
+    }
+
+    /**
+     * Creates and configures an entity from a Tiled map object with all necessary components.
+     */
+    public void onLoadObject(TiledMapTileMapObject tileMapObject) {
+        Entity entity = this.engine.createEntity();
+        TiledMapTile tile = tileMapObject.getTile();
+        TextureRegion textureRegion = getTextureRegion(tile);
+
+//        float sortOffsetY = tile.getProperties().get("sortOffsetY", 0, Integer.class);
+//        sortOffsetY *= GdxGame.UNIT_SCALE;
+        int z = tile.getProperties().get("z", 1, Integer.class);
+//
+        addEntityTransform(
+            tileMapObject.getX(), tileMapObject.getY(), z,
+            textureRegion.getRegionWidth(), textureRegion.getRegionHeight(),
+            tileMapObject.getScaleX(), tileMapObject.getScaleY(),
+            //sortOffsetY,
+            entity);
+//        BodyDef.BodyType bodyType = getObjectBodyType(tile);
+//        addEntityPhysic(
+//            tile.getObjects(),
+//            bodyType,
+//            Vector2.Zero,
+//            entity);
+//        addEntityAnimation(tile, entity);
+//        addEntityMove(tile, entity);
+//        addEntityController(tileMapObject, entity);
+//        addEntityCameraFollow(tileMapObject, entity);
+//        addEntityLife(tile, entity);
+//        addEntityPlayer(tileMapObject, entity);
+//        addEntityAttack(tile, entity);
+//        entity.add(new Facing(FacingDirection.DOWN));
+//        entity.add(new Fsm(entity));
+          entity.add(new Graphic(Color.WHITE.cpy(), textureRegion));
+//        entity.add(new Tiled(tileMapObject));
+
+        this.engine.addEntity(entity);
+    }
+
+    private TextureRegion getTextureRegion(TiledMapTile tile) {
+//        String atlasAssetStr = tile.getProperties().get("atlasAsset", "OBJECTS", String.class);
+//        AtlasAsset atlasAsset = AtlasAsset.valueOf(atlasAssetStr);
+//        FileTextureData textureData = (FileTextureData) tile.getTextureRegion().getTexture().getTextureData();
+//        String atlasKey = textureData.getFileHandle().nameWithoutExtension();
+//        TextureAtlas textureAtlas = assetService.get(atlasAsset);
+//        TextureAtlas.AtlasRegion region = textureAtlas.findRegion(atlasKey + "/" + atlasKey);
+//        if (region != null) {
+//            return region;
+//        }
+
+        // Region not part of an atlas, or the object has an animation.
+        // If it has an animation, then its region is updated in the AnimationSystem.
+        // If it has no region, then we render the region of the Tiled editor to show something, but
+        // that will add one render call due to texture swapping.
+        return tile.getTextureRegion();
+    }
+
+    private static void addEntityTransform(
+        float x, float y, int z,
+        float w, float h,
+        float scaleX, float scaleY,
+        //float sortOffsetY,
+        Entity entity
+    ) {
+        Vector2 position = new Vector2(x, y);
+        Vector2 size = new Vector2(w, h);
+        Vector2 scaling = new Vector2(scaleX, scaleY);
+
+        position.scl(GdxGame.UNIT_SCALE);
+        size.scl(GdxGame.UNIT_SCALE);
+
+        entity.add(new Transform(position, z, size, scaling, 0f));
+    }
+
+
+}
