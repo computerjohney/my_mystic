@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.computerjohney.my_mystic.GdxGame;
 import com.computerjohney.my_mystic.asset.AssetService;
+import com.computerjohney.my_mystic.asset.AtlasAsset;
 import com.computerjohney.my_mystic.component.Graphic;
 import com.computerjohney.my_mystic.component.Transform;
 
@@ -43,10 +44,10 @@ public class TiledAshleyConfigurator {
         TiledMapTile tile = tileMapObject.getTile();
         TextureRegion textureRegion = getTextureRegion(tile);
 
-//        float sortOffsetY = tile.getProperties().get("sortOffsetY", 0, Integer.class);
-//        sortOffsetY *= GdxGame.UNIT_SCALE;
+        float sortOffsetY = tile.getProperties().get("sortOffsetY", 0, Integer.class);
+        sortOffsetY *= GdxGame.UNIT_SCALE;
         int z = tile.getProperties().get("z", 1, Integer.class);
-//
+
         addEntityTransform(
             tileMapObject.getX(), tileMapObject.getY(), z,
             textureRegion.getRegionWidth(), textureRegion.getRegionHeight(),
@@ -69,14 +70,32 @@ public class TiledAshleyConfigurator {
 //        entity.add(new Facing(FacingDirection.DOWN));
 //        entity.add(new Fsm(entity));
           entity.add(new Graphic(Color.WHITE.cpy(), textureRegion));
-//        entity.add(new Tiled(tileMapObject));
+    //    entity.add(new Tiled(tileMapObject));
 
         this.engine.addEntity(entity);
     }
 
     private TextureRegion getTextureRegion(TiledMapTile tile) {
-//        String atlasAssetStr = tile.getProperties().get("atlasAsset", "OBJECTS", String.class);
-//        AtlasAsset atlasAsset = AtlasAsset.valueOf(atlasAssetStr);
+        // use region in texture atlas...
+
+        // ref by string ""
+        String atlasAssetStr = tile.getProperties().get("atlasAsset", AtlasAsset.OBJECTS.name(), String.class);
+        AtlasAsset atlasAsset = AtlasAsset.valueOf(atlasAssetStr);
+        TextureAtlas textureAtlas = this.assetService.get(atlasAsset);
+        // now getting key eg. from  player/player
+        FileTextureData textureData = (FileTextureData) tile.getTextureRegion().getTexture().getTextureData();
+        String atlasKey = textureData.getFileHandle().nameWithoutExtension();
+
+        // then the region...
+        //TextureAtlas.AtlasRegion region = textureAtlas.findRegion(atlasKey + "/" + atlasKey);
+        TextureAtlas.AtlasRegion region = textureAtlas.findRegion(atlasKey);
+        if (region != null) {
+            return region;
+        }
+
+        // otherwise return the region that was used in tiled
+        // should prob log something...
+
 //        FileTextureData textureData = (FileTextureData) tile.getTextureRegion().getTexture().getTextureData();
 //        String atlasKey = textureData.getFileHandle().nameWithoutExtension();
 //        TextureAtlas textureAtlas = assetService.get(atlasAsset);

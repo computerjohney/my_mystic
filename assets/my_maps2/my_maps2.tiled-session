@@ -1,0 +1,39 @@
+{
+    "activeFile": "objects.tsx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "my_map.tmx": {
+            "scale": 2.165208333333333,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 68.35369960550369,
+                "y": 296.96911382661403
+            }
+        },
+        "my_tileset.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "objects.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "map.lastUsedFormat": "tmx",
+    "openFiles": [
+        "my_map.tmx",
+        "my_tileset.tsx",
+        "objects.tsx"
+    ],
+    "project": "my_maps2.tiled-project",
+    "recentFiles": [
+        "my_map.tmx",
+        "my_tileset.tsx",
+        "objects.tsx"
+    ]
+}
