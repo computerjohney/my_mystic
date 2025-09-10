@@ -5,7 +5,6 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -16,6 +15,8 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.computerjohney.my_mystic.asset.AssetService;
+import com.computerjohney.my_mystic.screen.GameScreen;
+import com.computerjohney.my_mystic.screen.LoadingScreen;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,13 +56,20 @@ public class GdxGame extends Game {
         //setScreen( MyFirstScreen.class);
 
         //passing this for cache and assets
-        addScreen(new GameScreen(this));
-        setScreen( GameScreen.class);
+        addScreen(new LoadingScreen(this, assetService));
+        setScreen( LoadingScreen.class);
+
+        //addScreen(new GameScreen(this));
+        //setScreen( GameScreen.class);
 
     }
 
     public void addScreen(Screen screen) {
         screenCache.put(screen.getClass(), screen);
+    }
+
+    public void removeScreen(Screen screen) {
+        screenCache.remove(screen.getClass());
     }
 
     public void setScreen(Class<? extends Screen> screenClass) {

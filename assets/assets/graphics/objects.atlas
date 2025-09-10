@@ -1,0 +1,48 @@
+
+objects.png
+size: 256, 128
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+chest
+  rotate: false
+  xy: 127, 64
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+house
+  rotate: false
+  xy: 2, 2
+  size: 80, 112
+  orig: 80, 112
+  offset: 0, 0
+  index: -1
+oak_tree
+  rotate: false
+  xy: 84, 51
+  size: 41, 63
+  orig: 41, 63
+  offset: 0, 0
+  index: -1
+player
+  rotate: false
+  xy: 84, 17
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+training_dummy
+  rotate: false
+  xy: 127, 82
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+trap
+  rotate: false
+  xy: 161, 98
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1

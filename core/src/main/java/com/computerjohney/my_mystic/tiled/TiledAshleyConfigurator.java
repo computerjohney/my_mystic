@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.computerjohney.my_mystic.GdxGame;
 import com.computerjohney.my_mystic.asset.AssetService;
+import com.computerjohney.my_mystic.asset.AtlasAsset;
 import com.computerjohney.my_mystic.component.Graphic;
 import com.computerjohney.my_mystic.component.Transform;
 
@@ -75,15 +76,15 @@ public class TiledAshleyConfigurator {
     }
 
     private TextureRegion getTextureRegion(TiledMapTile tile) {
-//        String atlasAssetStr = tile.getProperties().get("atlasAsset", "OBJECTS", String.class);
-//        AtlasAsset atlasAsset = AtlasAsset.valueOf(atlasAssetStr);
-//        FileTextureData textureData = (FileTextureData) tile.getTextureRegion().getTexture().getTextureData();
-//        String atlasKey = textureData.getFileHandle().nameWithoutExtension();
-//        TextureAtlas textureAtlas = assetService.get(atlasAsset);
-//        TextureAtlas.AtlasRegion region = textureAtlas.findRegion(atlasKey + "/" + atlasKey);
-//        if (region != null) {
-//            return region;
-//        }
+        String atlasAssetStr = tile.getProperties().get("atlasAsset", "OBJECTS", String.class);
+        AtlasAsset atlasAsset = AtlasAsset.valueOf(atlasAssetStr);
+        FileTextureData textureData = (FileTextureData) tile.getTextureRegion().getTexture().getTextureData();
+        String atlasKey = textureData.getFileHandle().nameWithoutExtension();
+        TextureAtlas textureAtlas = assetService.get(atlasAsset);
+        TextureAtlas.AtlasRegion region = textureAtlas.findRegion(atlasKey + "/" + atlasKey);
+        if (region != null) {
+            return region;
+        }
 
         // Region not part of an atlas, or the object has an animation.
         // If it has an animation, then its region is updated in the AnimationSystem.
