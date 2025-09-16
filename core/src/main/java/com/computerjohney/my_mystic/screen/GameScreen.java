@@ -2,6 +2,8 @@ package com.computerjohney.my_mystic.screen;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -20,27 +22,27 @@ import java.util.function.Consumer;
 public class GameScreen extends ScreenAdapter {
 
     // every gamescreen gets 1 of these...
-    private final GdxGame game;
-    private final Batch batch;
-    private final AssetService assetService;
-    private final Viewport viewport;
-    private final OrthographicCamera camera;
+//    private final GdxGame game;
+//    private final Batch batch;
+//    private final AssetService assetService;
+//    private final Viewport viewport;
+//    private final OrthographicCamera camera;
     private final Engine engine;
     private final TiledService tiledService;
     private final TiledAshleyConfigurator tiledAshleyConfigurator;
 
     public GameScreen(GdxGame game) {
-        this.game = game;
-        this.batch = game.getBatch();
-        this.assetService = game.getAssetService();
-        this.viewport = game.getViewport();
-        this.camera = game.getCamera();
-        this.tiledService = new TiledService(this.assetService);
+//        this.game = game;
+//        this.batch = game.getBatch();
+//        this.assetService = game.getAssetService();
+//        this.viewport = game.getViewport();
+//        this.camera = game.getCamera();
+        this.tiledService = new TiledService(game.getAssetService());
         this.engine = new Engine();
-        this.tiledAshleyConfigurator = new TiledAshleyConfigurator(this.engine, this.assetService);
+        this.tiledAshleyConfigurator = new TiledAshleyConfigurator(this.engine, game.getAssetService());
 
         // add systems as needed eg. moveSystem, animationSystem, heal, damage etc.
-        this.engine.addSystem(new RenderSystem(this.batch, this.viewport, this.camera));
+        this.engine.addSystem(new RenderSystem(game.getBatch(), game.getViewport(), game.getCamera()));
     }
 
     public void show() {
@@ -65,6 +67,11 @@ public class GameScreen extends ScreenAdapter {
         // clamp delta (taking too long)
         delta = Math.min(delta, 1 / 30f);
         this.engine.update(delta);
+
+        // super simple approach...
+//        if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
+//            System.out.println("W was just pressed");
+//        }
 
 
     }
