@@ -27,7 +27,11 @@
 </data>
  </layer>
  <objectgroup id="2" name="objects">
-  <object id="1" name="Player" type="Player" gid="195" x="52.5435" y="281.035" width="32" height="32"/>
+  <object id="1" name="Player" type="Player" gid="195" x="52.5435" y="281.035" width="32" height="32">
+   <properties>
+    <property name="controller" type="bool" value="true"/>
+   </properties>
+  </object>
   <object id="2" gid="193" x="354.288" y="154.572" width="80" height="112"/>
   <object id="3" gid="194" x="65.5161" y="221.311" width="41" height="63"/>
   <object id="4" gid="194" x="172.178" y="277.051" width="41" height="63"/>

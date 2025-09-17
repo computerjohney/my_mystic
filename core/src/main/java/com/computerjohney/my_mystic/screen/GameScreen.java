@@ -13,6 +13,11 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.computerjohney.my_mystic.GdxGame;
 import com.computerjohney.my_mystic.asset.AssetService;
 import com.computerjohney.my_mystic.asset.MapAsset;
+import com.computerjohney.my_mystic.input.ControllerState;
+import com.computerjohney.my_mystic.input.GameControllerState;
+import com.computerjohney.my_mystic.input.KeyboardController;
+import com.computerjohney.my_mystic.system.ControllerSystem;
+import com.computerjohney.my_mystic.system.MoveSystem;
 import com.computerjohney.my_mystic.system.RenderSystem;
 import com.computerjohney.my_mystic.tiled.TiledAshleyConfigurator;
 import com.computerjohney.my_mystic.tiled.TiledService;
@@ -22,7 +27,7 @@ import java.util.function.Consumer;
 public class GameScreen extends ScreenAdapter {
 
     // every gamescreen gets 1 of these...
-//    private final GdxGame game;
+    private final GdxGame game;
 //    private final Batch batch;
 //    private final AssetService assetService;
 //    private final Viewport viewport;
@@ -30,9 +35,10 @@ public class GameScreen extends ScreenAdapter {
     private final Engine engine;
     private final TiledService tiledService;
     private final TiledAshleyConfigurator tiledAshleyConfigurator;
+    private final KeyboardController keyboardController;
 
     public GameScreen(GdxGame game) {
-//        this.game = game;
+        this.game = game;
 //        this.batch = game.getBatch();
 //        this.assetService = game.getAssetService();
 //        this.viewport = game.getViewport();
@@ -40,13 +46,21 @@ public class GameScreen extends ScreenAdapter {
         this.tiledService = new TiledService(game.getAssetService());
         this.engine = new Engine();
         this.tiledAshleyConfigurator = new TiledAshleyConfigurator(this.engine, game.getAssetService());
+        this.keyboardController = new KeyboardController(GameControllerState.class, engine);
 
+        // 1st system executed for every...
+        this.engine.addSystem(new ControllerSystem(game));
+        this.engine.addSystem(new MoveSystem());
         // add systems as needed eg. moveSystem, animationSystem, heal, damage etc.
         this.engine.addSystem(new RenderSystem(game.getBatch(), game.getViewport(), game.getCamera()));
     }
 
     public void show() {
         //this.engine.getSystem(RenderSystem.class).setMap(this.assetService.get(MapAsset.MAIN));
+        game.setInputProcessors(keyboardController);
+        keyboardController.setActiveState(GameControllerState.class);
+
+
 
         // now setMap is consumer
         Consumer<TiledMap> renderConsumer = this.engine.getSystem(RenderSystem.class)::setMap;

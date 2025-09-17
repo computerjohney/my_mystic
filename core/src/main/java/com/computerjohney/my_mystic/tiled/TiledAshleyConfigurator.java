@@ -15,7 +15,9 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.computerjohney.my_mystic.GdxGame;
 import com.computerjohney.my_mystic.asset.AssetService;
 import com.computerjohney.my_mystic.asset.AtlasAsset;
+import com.computerjohney.my_mystic.component.Controller;
 import com.computerjohney.my_mystic.component.Graphic;
+import com.computerjohney.my_mystic.component.Move;
 import com.computerjohney.my_mystic.component.Transform;
 
 public class TiledAshleyConfigurator {
@@ -61,8 +63,8 @@ public class TiledAshleyConfigurator {
 //            Vector2.Zero,
 //            entity);
 //        addEntityAnimation(tile, entity);
-//        addEntityMove(tile, entity);
-//        addEntityController(tileMapObject, entity);
+        addEntityMove(tile, entity);
+        addEntityController(tileMapObject, entity);
 //        addEntityCameraFollow(tileMapObject, entity);
 //        addEntityLife(tile, entity);
 //        addEntityPlayer(tileMapObject, entity);
@@ -128,5 +130,19 @@ public class TiledAshleyConfigurator {
         entity.add(new Transform(position, z, size, scaling, 0f));
     }
 
+    private void addEntityController(TiledMapTileMapObject tileMapObject, Entity entity) {
+        boolean controller = tileMapObject.getProperties().get("controller", false, Boolean.class);
+        if (!controller) return;
+
+        entity.add(new Controller());
+    }
+
+    private void addEntityMove(TiledMapTile tile, Entity entity) {
+        // so need this in Tiled (objects.tsx)...
+        float speed = tile.getProperties().get("speed", 0f, Float.class);
+        if (speed == 0f) return;
+
+        entity.add(new Move(speed));
+    }
 
 }
