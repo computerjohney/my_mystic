@@ -89,8 +89,8 @@ public class TiledAshleyConfigurator {
         String atlasKey = textureData.getFileHandle().nameWithoutExtension();
 
         // then the region...
-        //TextureAtlas.AtlasRegion region = textureAtlas.findRegion(atlasKey + "/" + atlasKey);
-        TextureAtlas.AtlasRegion region = textureAtlas.findRegion(atlasKey);
+        TextureAtlas.AtlasRegion region = textureAtlas.findRegion(atlasKey + "/" + atlasKey);
+        //TextureAtlas.AtlasRegion region = textureAtlas.findRegion(atlasKey);
         if (region != null) {
             return region;
         }

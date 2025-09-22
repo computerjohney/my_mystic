@@ -10,7 +10,7 @@
             "selectedLayer": 1,
             "viewCenter": {
                 "x": 68.35369960550369,
-                "y": 296.96911382661403
+                "y": 363.24449148465317
             }
         },
         "my_tileset.tsx": {
@@ -24,6 +24,7 @@
             "scaleInEditor": 1
         }
     },
+    "last.imagePath": "/home/johney/libgdx/my_mystic/assets/my_maps2/objects/player",
     "map.lastUsedFormat": "tmx",
     "openFiles": [
         "my_map.tmx",
