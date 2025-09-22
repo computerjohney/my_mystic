@@ -5,19 +5,19 @@
   <properties>
    <property name="atlasAsset" value="OBJECTS"/>
   </properties>
-  <image source="objects/house.png" width="80" height="112"/>
+  <image source="objects/house/house.png" width="80" height="112"/>
  </tile>
  <tile id="1">
   <properties>
    <property name="atlasAsset" value="OBJECTS"/>
   </properties>
-  <image source="objects/oak_tree.png" width="41" height="63"/>
+  <image source="objects/oak_tree/oak_tree.png" width="41" height="63"/>
  </tile>
  <tile id="2">
   <properties>
    <property name="atlasAsset" value="OBJECTS"/>
    <property name="speed" type="float" value="3"/>
   </properties>
-  <image source="objects/player.png" width="32" height="32"/>
+  <image source="objects/player/player.png" width="32" height="32"/>
  </tile>
 </tileset>
