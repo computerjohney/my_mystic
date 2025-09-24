@@ -16,7 +16,10 @@ import com.computerjohney.my_mystic.asset.MapAsset;
 import com.computerjohney.my_mystic.input.ControllerState;
 import com.computerjohney.my_mystic.input.GameControllerState;
 import com.computerjohney.my_mystic.input.KeyboardController;
+import com.computerjohney.my_mystic.system.AnimationSystem;
 import com.computerjohney.my_mystic.system.ControllerSystem;
+import com.computerjohney.my_mystic.system.FacingSystem;
+import com.computerjohney.my_mystic.system.FsmSystem;
 import com.computerjohney.my_mystic.system.MoveSystem;
 import com.computerjohney.my_mystic.system.RenderSystem;
 import com.computerjohney.my_mystic.tiled.TiledAshleyConfigurator;
@@ -52,6 +55,9 @@ public class GameScreen extends ScreenAdapter {
         this.engine.addSystem(new ControllerSystem(game));
         this.engine.addSystem(new MoveSystem());
         // add systems as needed eg. moveSystem, animationSystem, heal, damage etc.
+        this.engine.addSystem(new FsmSystem());
+        this.engine.addSystem(new FacingSystem());
+        this.engine.addSystem(new AnimationSystem(game.getAssetService()));
         this.engine.addSystem(new RenderSystem(game.getBatch(), game.getViewport(), game.getCamera()));
     }
 
