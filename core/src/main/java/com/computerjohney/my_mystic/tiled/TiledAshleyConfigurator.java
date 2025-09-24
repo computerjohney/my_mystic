@@ -3,6 +3,8 @@ package com.computerjohney.my_mystic.tiled;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FileTextureData;
@@ -15,7 +17,10 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.computerjohney.my_mystic.GdxGame;
 import com.computerjohney.my_mystic.asset.AssetService;
 import com.computerjohney.my_mystic.asset.AtlasAsset;
+import com.computerjohney.my_mystic.component.Animation2D;
 import com.computerjohney.my_mystic.component.Controller;
+import com.computerjohney.my_mystic.component.Facing;
+import com.computerjohney.my_mystic.component.Fsm;
 import com.computerjohney.my_mystic.component.Graphic;
 import com.computerjohney.my_mystic.component.Move;
 import com.computerjohney.my_mystic.component.Transform;
@@ -62,16 +67,16 @@ public class TiledAshleyConfigurator {
 //            bodyType,
 //            Vector2.Zero,
 //            entity);
-//        addEntityAnimation(tile, entity);
+        addEntityAnimation(tile, entity);
         addEntityMove(tile, entity);
         addEntityController(tileMapObject, entity);
 //        addEntityCameraFollow(tileMapObject, entity);
 //        addEntityLife(tile, entity);
 //        addEntityPlayer(tileMapObject, entity);
 //        addEntityAttack(tile, entity);
-//        entity.add(new Facing(FacingDirection.DOWN));
-//        entity.add(new Fsm(entity));
-          entity.add(new Graphic(Color.WHITE.cpy(), textureRegion));
+        entity.add(new Facing(Facing.FacingDirection.DOWN));
+        entity.add(new Fsm(entity));
+        entity.add(new Graphic(Color.WHITE.cpy(), textureRegion));
     //    entity.add(new Tiled(tileMapObject));
 
         this.engine.addEntity(entity);
@@ -128,6 +133,22 @@ public class TiledAshleyConfigurator {
         size.scl(GdxGame.UNIT_SCALE);
 
         entity.add(new Transform(position, z, size, scaling, 0f));
+    }
+
+    private void addEntityAnimation(TiledMapTile tile, Entity entity) {
+        String animationStr = tile.getProperties().get("animation", "", String.class);
+        if (animationStr.isBlank()) {
+            return;
+        }
+        Animation2D.AnimationType animationType = Animation2D.AnimationType.valueOf(animationStr);
+
+        String atlasAssetStr = tile.getProperties().get("atlasAsset", "OBJECTS", String.class);
+        AtlasAsset atlasAsset = AtlasAsset.valueOf(atlasAssetStr);
+        FileTextureData textureData = (FileTextureData) tile.getTextureRegion().getTexture().getTextureData();
+        String atlasKey = textureData.getFileHandle().nameWithoutExtension();
+        float speed = tile.getProperties().get("animationSpeed", 0f, Float.class);
+
+        entity.add(new Animation2D(atlasAsset, atlasKey, animationType, Animation.PlayMode.LOOP, speed));
     }
 
     private void addEntityController(TiledMapTileMapObject tileMapObject, Entity entity) {
