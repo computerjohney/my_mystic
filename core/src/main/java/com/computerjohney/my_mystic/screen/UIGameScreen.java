@@ -5,10 +5,12 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -52,6 +54,8 @@ public class UIGameScreen extends ScreenAdapter {
 
     private final Stage stage;
     private final Viewport uiViewport;
+    private final Camera uiCamera;
+    //private final Batch uiBatch;
     //private final Skin skin;
     private Stage hudStage;
     private Label scoreLabel;
@@ -84,10 +88,13 @@ public class UIGameScreen extends ScreenAdapter {
 //        //scoreLabel = new Label("Score: 0", skin);
 //        textButton.setPosition(10, Gdx.graphics.getHeight() - scoreLabel.getHeight() - 10); // Top-left
 //        hudStage.addActor(textButton);
-        this.uiViewport = new FitViewport(400f, 400f);
+        this.uiCamera = new OrthographicCamera();
+        this.uiViewport = new FitViewport(400, 300, uiCamera);
+        //this.uiBatch = new SpriteBatch();
+
+
         this.stage = new Stage(uiViewport);
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("my_maps2/ui/CherryCreamSoda-Regular.ttf"));
-        //this.skin = new Skin(Gdx.files.internal("my_maps2/ui/skin.json"));
+
     }
 
     @Override
@@ -113,6 +120,8 @@ public class UIGameScreen extends ScreenAdapter {
         TiledMap tiledMap = this.tiledService.loadMap(MapAsset.MAIN);
         this.tiledService.setMap(tiledMap);
 
+
+        // This worked ...
         //this.stage.addActor(new Button());
         // Load the PNG texture
         Texture aTexture = new Texture(Gdx.files.internal("my_maps2/objects/house/house.png"));
@@ -121,7 +130,9 @@ public class UIGameScreen extends ScreenAdapter {
         Image aImage = new Image(aTexture);
 
         // Set position and size (optional, here it fills the screen)
-        aImage.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        //aImage.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        aImage.setPosition(300, 50); // Positions the actor at (100, 200) relative to its parent
+
 
         // Add the Image actor to the stage
         stage.addActor(aImage);
@@ -144,7 +155,7 @@ public class UIGameScreen extends ScreenAdapter {
 //        }
 
         uiViewport.apply();
-        //stage.getBatch().setColor(Color.RED);
+
         stage.act(delta);
         stage.draw();
 
