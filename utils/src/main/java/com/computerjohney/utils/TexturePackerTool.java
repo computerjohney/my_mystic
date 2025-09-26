@@ -6,11 +6,11 @@ public class TexturePackerTool {
 
     public static void main(String[] args){
         //String inputDir = "assets/assets_raw/objects";
-        String inputDir = "assets/my_maps2/objects";
+        String inputDir = "assets/assets_raw/buttons";
         //String outputDir = "assets/assets/graphics";
-        String outputDir = "assets/my_maps2/graphics";
+        String outputDir = "assets/my_maps2/buttons";
         // filename of texture atlas
-        String packFileName = "objects";
+        String packFileName = "buttons";
 
         TexturePacker.process(inputDir, outputDir, packFileName);
     }

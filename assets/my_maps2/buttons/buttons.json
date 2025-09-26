@@ -1,0 +1,20 @@
+{
+    "com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle": {
+    "button_down-style": {
+      "up": "button_down_a",
+      "down": "button_down_c"
+    },
+    "button_left-style": {
+      "up": "button_left_a",
+      "down": "button_left_c"
+    },
+    "button_right-style": {
+      "up": "button_right_a",
+      "down": "button_right_c"
+    },
+    "button_up-style": {
+     "up": "button_up_a",
+     "down": "button_up_c"
+    }
+  }
+}

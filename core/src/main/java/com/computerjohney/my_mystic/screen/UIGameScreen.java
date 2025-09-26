@@ -5,18 +5,23 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -50,11 +55,12 @@ public class UIGameScreen extends ScreenAdapter {
     private final TiledAshleyConfigurator tiledAshleyConfigurator;
     private final KeyboardController keyboardController;
 
-    private final Stage stage;
+    //private final Stage stage;
     private final Viewport uiViewport;
+    private final Camera uiCamera;
+    //private final Batch uiBatch;
     //private final Skin skin;
-    private Stage hudStage;
-    private Label scoreLabel;
+    private final Stage uiStage;
 
     public UIGameScreen(GdxGame game) {
         this.game = game;
@@ -84,10 +90,13 @@ public class UIGameScreen extends ScreenAdapter {
 //        //scoreLabel = new Label("Score: 0", skin);
 //        textButton.setPosition(10, Gdx.graphics.getHeight() - scoreLabel.getHeight() - 10); // Top-left
 //        hudStage.addActor(textButton);
-        this.uiViewport = new FitViewport(400f, 400f);
-        this.stage = new Stage(uiViewport);
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("my_maps2/ui/CherryCreamSoda-Regular.ttf"));
-        //this.skin = new Skin(Gdx.files.internal("my_maps2/ui/skin.json"));
+        this.uiCamera = new OrthographicCamera();
+        this.uiViewport = new FitViewport(400, 300, uiCamera);
+        //this.uiBatch = new SpriteBatch();
+
+        //this.stage = new Stage(uiViewport, game.getBatch());
+        this.uiStage = new Stage(uiViewport, game.getBatch());
+        Gdx.input.setInputProcessor(uiStage); // Essential to process input
     }
 
     @Override
@@ -101,8 +110,6 @@ public class UIGameScreen extends ScreenAdapter {
         game.setInputProcessors(keyboardController);
         keyboardController.setActiveState(GameControllerState.class);
 
-
-
         // now setMap is consumer
         Consumer<TiledMap> renderConsumer = this.engine.getSystem(RenderSystem.class)::setMap;
         this.tiledService.setMapChangeConsumer(renderConsumer);
@@ -113,18 +120,33 @@ public class UIGameScreen extends ScreenAdapter {
         TiledMap tiledMap = this.tiledService.loadMap(MapAsset.MAIN);
         this.tiledService.setMap(tiledMap);
 
+        Skin buttonSkin = new Skin(Gdx.files.internal("my_maps2/buttons/buttons.json"));
+        ImageButton image_button_down = new ImageButton(buttonSkin.get("button_down-style", ImageButton.ImageButtonStyle.class));
+        // Create the ImageButton style
+
+        // This worked ...
         //this.stage.addActor(new Button());
         // Load the PNG texture
-        Texture aTexture = new Texture(Gdx.files.internal("my_maps2/objects/house/house.png"));
+        //Texture aTexture = new Texture(Gdx.files.internal("my_maps2/objects/house/house.png"));
 
         // Create an Image actor from the texture
-        Image aImage = new Image(aTexture);
+        //Image aImage = new Image(aTexture);
 
         // Set position and size (optional, here it fills the screen)
-        aImage.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        //aImage.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        image_button_down.setPosition(300, 50); // Positions the actor at (100, 200) relative to its parent
+
+        // Add a ClickListener to the button
+        image_button_down.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.log("ImageButton", "Button clicked!");
+                // Perform your desired action here
+            }
+        });
 
         // Add the Image actor to the stage
-        stage.addActor(aImage);
+        uiStage.addActor(image_button_down);
 
 
     }
@@ -144,15 +166,17 @@ public class UIGameScreen extends ScreenAdapter {
 //        }
 
         uiViewport.apply();
-        //stage.getBatch().setColor(Color.RED);
-        stage.act(delta);
-        stage.draw();
+
+        uiStage.act(delta);
+        uiStage.draw();
 
 
     }
 
     public void dispose() {
-        stage.dispose();
+
+
+        uiStage.dispose();
         for (EntitySystem system : this.engine.getSystems()) {
             if (system instanceof Disposable disposableSystem) {
                 disposableSystem.dispose();
