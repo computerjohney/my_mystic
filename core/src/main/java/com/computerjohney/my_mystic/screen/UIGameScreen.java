@@ -14,12 +14,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Disposable;
@@ -28,6 +31,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.computerjohney.my_mystic.GdxGame;
 import com.computerjohney.my_mystic.asset.AssetService;
 import com.computerjohney.my_mystic.asset.MapAsset;
+import com.computerjohney.my_mystic.input.Command;
 import com.computerjohney.my_mystic.input.ControllerState;
 import com.computerjohney.my_mystic.input.GameControllerState;
 import com.computerjohney.my_mystic.input.KeyboardController;
@@ -40,6 +44,9 @@ import com.computerjohney.my_mystic.system.RenderSystem;
 import com.computerjohney.my_mystic.tiled.TiledAshleyConfigurator;
 import com.computerjohney.my_mystic.tiled.TiledService;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class UIGameScreen extends ScreenAdapter {
@@ -61,6 +68,7 @@ public class UIGameScreen extends ScreenAdapter {
     //private final Batch uiBatch;
     //private final Skin skin;
     private final Stage uiStage;
+
 
     public UIGameScreen(GdxGame game) {
         this.game = game;
@@ -91,12 +99,12 @@ public class UIGameScreen extends ScreenAdapter {
 //        textButton.setPosition(10, Gdx.graphics.getHeight() - scoreLabel.getHeight() - 10); // Top-left
 //        hudStage.addActor(textButton);
         this.uiCamera = new OrthographicCamera();
-        this.uiViewport = new FitViewport(400, 300, uiCamera);
+        this.uiViewport = new FitViewport(500, 300, uiCamera);
         //this.uiBatch = new SpriteBatch();
 
         //this.stage = new Stage(uiViewport, game.getBatch());
         this.uiStage = new Stage(uiViewport, game.getBatch());
-        Gdx.input.setInputProcessor(uiStage); // Essential to process input
+        //Gdx.input.setInputProcessor(uiStage); // Essential to process input
     }
 
     @Override
@@ -107,7 +115,9 @@ public class UIGameScreen extends ScreenAdapter {
 
     public void show() {
         //this.engine.getSystem(RenderSystem.class).setMap(this.assetService.get(MapAsset.MAIN));
-        game.setInputProcessors(keyboardController);
+
+        // going to set this for keyboard and on screen buttons
+        game.setInputProcessors(keyboardController, uiStage);
         keyboardController.setActiveState(GameControllerState.class);
 
         // now setMap is consumer
@@ -120,10 +130,62 @@ public class UIGameScreen extends ScreenAdapter {
         TiledMap tiledMap = this.tiledService.loadMap(MapAsset.MAIN);
         this.tiledService.setMap(tiledMap);
 
-        Skin buttonSkin = new Skin(Gdx.files.internal("my_maps2/buttons/buttons.json"));
-        ImageButton image_button_down = new ImageButton(buttonSkin.get("button_down-style", ImageButton.ImageButtonStyle.class));
-        // Create the ImageButton style
+        //
+        //
+        // Movement buttons ____________________________________________________________________________________________________
+        //
+        int screenWidth = Gdx.graphics.getWidth();
+        int screenHeight = Gdx.graphics.getHeight();
 
+        Gdx.app.log("Screen Dimensions", "Width: " + screenWidth + ", Height: " + screenHeight);
+
+        float xOffset = 450;
+        float yOffset = 90;
+
+
+        Skin buttonSkin = new Skin(Gdx.files.internal("my_maps2/buttons/buttons.json"));
+
+        ImageButton image_button_left = new ImageButton(buttonSkin.get("button_left-style", ImageButton.ImageButtonStyle.class));
+        ImageButton image_button_right = new ImageButton(buttonSkin.get("button_right-style", ImageButton.ImageButtonStyle.class));
+        ImageButton image_button_up = new ImageButton(buttonSkin.get("button_up-style", ImageButton.ImageButtonStyle.class));
+        ImageButton image_button_down = new ImageButton(buttonSkin.get("button_down-style", ImageButton.ImageButtonStyle.class));
+
+        Table table1 = new Table();
+        Table table2 = new Table();
+        Table table3 = new Table();
+        Table table4 = new Table();
+        table1.setFillParent(false); // Make the table fill the entire stage
+        table2.setFillParent(false);
+        table3.setFillParent(false);
+        table4.setFillParent(false);
+        // Add actors to create a grid
+        table1.add(image_button_up).minWidth(30).minHeight(30).expand().fill();
+        table1.setPosition(xOffset, yOffset);
+
+        table2.add(image_button_left).minWidth(30).minHeight(30).expand().fill();
+        table2.setPosition(xOffset-30, yOffset-30);
+
+        table3.add(image_button_right).minWidth(30).minHeight(30).expand().fill();
+        table3.setPosition(xOffset+30, yOffset-30);
+
+        table4.add(image_button_down).minWidth(30).minHeight(30).expand().fill();
+        table4.setPosition(xOffset, yOffset-60);
+
+        uiStage.addActor(table1);
+        uiStage.addActor(table2);
+        uiStage.addActor(table3);
+        uiStage.addActor(table4);
+
+        // Optional: Enable debug lines to see cell boundaries
+//        table1.debug();
+//        table2.debug();
+//        table3.debug();
+//        table4.debug();
+
+//        image_button_left.setPosition( 320, yOffset );
+//        image_button_right.setPosition( 360, yOffset );
+//        image_button_up.setPosition( xOffset , yOffset +20);
+//        image_button_down.setPosition( xOffset , yOffset -20 );
         // This worked ...
         //this.stage.addActor(new Button());
         // Load the PNG texture
@@ -134,19 +196,65 @@ public class UIGameScreen extends ScreenAdapter {
 
         // Set position and size (optional, here it fills the screen)
         //aImage.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        image_button_down.setPosition(300, 50); // Positions the actor at (100, 200) relative to its parent
+        //image_button_down.setPosition(300, 50); // Positions the actor at (100, 200) relative to its parent
 
-        // Add a ClickListener to the button
-        image_button_down.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.log("ImageButton", "Button clicked!");
-                // Perform your desired action here
-            }
-        });
+        //really need a
+        //ButtonGroup<ImageButton> buttonGroup = new ButtonGroup<>(image_button_left, image_button_right, image_button_up, image_button_down);
+        // or maybe
+//        HashMap<String, ImageButton> buttonMap = new HashMap<>();
+//        buttonMap.put("button_left", image_button_left);
+//        buttonMap.put("button_right", image_button_right);
+//        buttonMap.put("button_up", image_button_up);
+//        buttonMap.put("button_down", image_button_down);
+
+        //Quills is...
+//        private static final Map<Integer, Command> KEY_MAPPING = Map.ofEntries(
+//            Map.entry(Input.Keys.W, Command.UP),
+//            Map.entry(Input.Keys.S, Command.DOWN),
+//            Map.entry(Input.Keys.A, Command.LEFT),
+//            Map.entry(Input.Keys.D, Command.RIGHT),
+//            Map.entry(Input.Keys.SPACE, Command.SELECT),
+//            Map.entry(Input.Keys.ESCAPE, Command.CANCEL)
+//        );
+
+        Map<ImageButton, Integer> buttonMap = Map.ofEntries(
+            Map.entry(image_button_left, Input.Keys.A),     //"Command.LEFT"
+            Map.entry(image_button_right, Input.Keys.D),    //"Command.RIGHT"
+            Map.entry(image_button_up, Input.Keys.W),       //"Command.UP"
+            Map.entry(image_button_down, Input.Keys.S)      //"Command.DOWN"
+        );
+
+        for (Map.Entry<ImageButton, Integer> entry : buttonMap.entrySet()) {
+            //String key = entry.getKey();
+            ImageButton btn = entry.getKey();
+            Integer key = entry.getValue();
+
+            btn.addListener(new InputListener() {
+
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    // This method is called when a touch/mouse button is pressed down on the actor
+                    System.out.println("Touch down on "+ key + " at: " + x + ", " + y);
+                    keyboardController.keyDown(key);
+                    return true; // Return true to indicate the event was handled
+                }
+
+                @Override
+                public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                    // This method is called when a touch/mouse button is released on the actor
+                    System.out.println("Touch up on "+ key + " at: " + x + ", " + y);
+                    keyboardController.keyUp(key);
+                }
+
+            });
+        }
 
         // Add the Image actor to the stage
-        uiStage.addActor(image_button_down);
+//        uiStage.addActor(image_button_left);
+//        uiStage.addActor(image_button_right);
+//        uiStage.addActor(image_button_up);
+//        uiStage.addActor(image_button_down);
+
 
 
     }
