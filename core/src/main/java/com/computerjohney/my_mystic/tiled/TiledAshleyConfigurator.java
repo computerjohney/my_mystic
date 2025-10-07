@@ -48,7 +48,6 @@ public class TiledAshleyConfigurator {
         this.assetService = assetService;
     }
 
-
     // he didn't implement static bodies as entities at 1st
     public void onLoadTile(TiledMapTile tiledMapTile, float x, float y) {
         createBody(
@@ -60,9 +59,6 @@ public class TiledAshleyConfigurator {
             "environment"
         );
     }
-
-
-
 
     /**
      * Creates and configures an entity from a Tiled map object with all necessary components.

@@ -32,16 +32,18 @@ public class LoadingScreen extends ScreenAdapter {
             createScreens();
             this.game.removeScreen(this);
             this.dispose();
+            //this.game.setScreen(UIGameScreen.class);
+            //this.game.setScreen(GameScreen.class);
             this.game.setScreen(UIGameScreen.class);
-
         }
     }
 
     private void createScreens() {
 
         //addScreen(new LoadingScreen(this, assetService));
+        //this.game.addScreen(new UIGameScreen(this.game));
+        //this.game.addScreen(new GameScreen(this.game));
         this.game.addScreen(new UIGameScreen(this.game));
-
     }
 
 }

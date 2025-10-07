@@ -78,14 +78,14 @@ public class GameScreen extends ScreenAdapter {
         game.setInputProcessors(keyboardController);
         keyboardController.setActiveState(GameControllerState.class);
 
-
-
+        // use the consumers...
         // now setMap is consumer
         Consumer<TiledMap> renderConsumer = this.engine.getSystem(RenderSystem.class)::setMap;
         this.tiledService.setMapChangeConsumer(renderConsumer);
         // later can add to renderConsumer with .andThen
 
         this.tiledService.setLoadObjectConsumer(this.tiledAshleyConfigurator::onLoadObject);
+        this.tiledService.setLoadTileConsumer(tiledAshleyConfigurator::onLoadTile);
 
         TiledMap tiledMap = this.tiledService.loadMap(MapAsset.MAIN);
         this.tiledService.setMap(tiledMap);

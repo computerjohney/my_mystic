@@ -65,6 +65,7 @@ public class UIGameScreen extends ScreenAdapter {
     private final TiledService tiledService;
     private final TiledAshleyConfigurator tiledAshleyConfigurator;
     private final KeyboardController keyboardController;
+    private final World physicWorld;
 
     //private final Stage stage;
     private final Viewport uiViewport;
@@ -72,7 +73,7 @@ public class UIGameScreen extends ScreenAdapter {
     //private final Batch uiBatch;
     //private final Skin skin;
     private final Stage uiStage;
-    private final World physicWorld;
+
 
 
     public UIGameScreen(GdxGame game) {
