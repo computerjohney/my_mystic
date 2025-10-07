@@ -8,11 +8,15 @@ import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FileTextureData;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.computerjohney.my_mystic.GdxGame;
 import com.computerjohney.my_mystic.asset.AssetService;
@@ -23,6 +27,7 @@ import com.computerjohney.my_mystic.component.Facing;
 import com.computerjohney.my_mystic.component.Fsm;
 import com.computerjohney.my_mystic.component.Graphic;
 import com.computerjohney.my_mystic.component.Move;
+import com.computerjohney.my_mystic.component.Physic;
 import com.computerjohney.my_mystic.component.Transform;
 
 public class TiledAshleyConfigurator {
@@ -30,18 +35,34 @@ public class TiledAshleyConfigurator {
     private static final Vector2 DEFAULT_PHYSIC_SCALING = new Vector2(1f, 1f);
 
     private final Engine engine;
-    //private final World physicWorld;
+    private final World physicWorld;
     private final MapObjects tmpMapObjects;
     private final Vector2 tmpVec2;
     private final AssetService assetService;
 
-    public TiledAshleyConfigurator(Engine engine, AssetService assetService) {
+    public TiledAshleyConfigurator(Engine engine, AssetService assetService, World physicWorld) {
         this.engine = engine;
-        //this.physicWorld = physicWorld;
+        this.physicWorld = physicWorld;
         this.tmpMapObjects = new MapObjects();
         this.tmpVec2 = new Vector2();
         this.assetService = assetService;
     }
+
+
+    // he didn't implement static bodies as entities at 1st
+    public void onLoadTile(TiledMapTile tiledMapTile, float x, float y) {
+        createBody(
+            tiledMapTile.getObjects(),
+            new Vector2(x, y),
+            DEFAULT_PHYSIC_SCALING,
+            BodyDef.BodyType.StaticBody,
+            Vector2.Zero,
+            "environment"
+        );
+    }
+
+
+
 
     /**
      * Creates and configures an entity from a Tiled map object with all necessary components.
@@ -61,12 +82,12 @@ public class TiledAshleyConfigurator {
             tileMapObject.getScaleX(), tileMapObject.getScaleY(),
             //sortOffsetY,
             entity);
-//        BodyDef.BodyType bodyType = getObjectBodyType(tile);
-//        addEntityPhysic(
-//            tile.getObjects(),
-//            bodyType,
-//            Vector2.Zero,
-//            entity);
+        BodyDef.BodyType bodyType = getObjectBodyType(tile);
+        addEntityPhysic(
+            tile.getObjects(),
+            bodyType,
+            Vector2.Zero,
+            entity);
         addEntityAnimation(tile, entity);
         addEntityMove(tile, entity);
         addEntityController(tileMapObject, entity);
@@ -80,6 +101,37 @@ public class TiledAshleyConfigurator {
     //    entity.add(new Tiled(tileMapObject));
 
         this.engine.addEntity(entity);
+    }
+
+    private BodyDef.BodyType getObjectBodyType(TiledMapTile tile) {
+        String classType = tile.getProperties().get("type", "", String.class);
+        if ("Prop".equals(classType)) {
+            return BodyDef.BodyType.StaticBody;
+        }
+
+        String bodyTypeStr = tile.getProperties().get("bodyType", "DynamicBody", String.class);
+        return BodyDef.BodyType.valueOf(bodyTypeStr);
+    }
+
+    private void addEntityPhysic(MapObject mapObject, @SuppressWarnings("SameParameterValue") BodyDef.BodyType bodyType, Vector2 relativeTo, Entity entity) {
+        if (tmpMapObjects.getCount() > 0) tmpMapObjects.remove(0);
+
+        tmpMapObjects.add(mapObject);
+        addEntityPhysic(tmpMapObjects, bodyType, relativeTo, entity);
+    }
+
+    private void addEntityPhysic(MapObjects mapObjects, BodyDef.BodyType bodyType, Vector2 relativeTo, Entity entity) {
+        if (mapObjects.getCount() == 0) return;
+
+        Transform transform = Transform.MAPPER.get(entity);
+        Body body = createBody(mapObjects,
+            transform.getPosition(),
+            transform.getScaling(),
+            bodyType,
+            relativeTo,
+            entity);
+
+        entity.add(new Physic(body, transform.getPosition().cpy()));
     }
 
     private TextureRegion getTextureRegion(TiledMapTile tile) {
@@ -117,6 +169,32 @@ public class TiledAshleyConfigurator {
         // that will add one render call due to texture swapping.
         return tile.getTextureRegion();
     }
+
+
+    private Body createBody(MapObjects mapObjects,
+                            Vector2 position,
+                            Vector2 scaling,
+                            BodyDef.BodyType bodyType,
+                            Vector2 relativeTo,
+                            Object userData) {
+        BodyDef bodyDef = new BodyDef();            // its an enum, have a look
+        bodyDef.type = bodyType;
+        bodyDef.position.set(position);
+        bodyDef.fixedRotation = true;
+
+        Body body = this.physicWorld.createBody(bodyDef);
+        body.setUserData(userData);
+        for (MapObject object : mapObjects) {
+            FixtureDef fixtureDef = TiledPhysics.fixtureDefOf(object, scaling, relativeTo);
+            Fixture fixture = body.createFixture(fixtureDef);
+            fixture.setUserData(object.getName());
+            fixtureDef.shape.dispose();
+        }
+        return body;
+    }
+
+
+
 
     private static void addEntityTransform(
         float x, float y, int z,

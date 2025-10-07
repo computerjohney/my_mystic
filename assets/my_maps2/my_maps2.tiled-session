@@ -1,5 +1,5 @@
 {
-    "activeFile": "objects.tsx",
+    "activeFile": "my_tileset.tsx",
     "expandedProjectPaths": [
         "."
     ],
@@ -7,7 +7,7 @@
     "fileStates": {
         "my_map.tmx": {
             "scale": 2.165208333333333,
-            "selectedLayer": 1,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 239.9307226017512,
                 "y": 159.56894063311847
@@ -35,7 +35,7 @@
     "property.type": "float",
     "recentFiles": [
         "my_map.tmx",
-        "my_tileset.tsx",
-        "objects.tsx"
+        "objects.tsx",
+        "my_tileset.tsx"
     ]
 }

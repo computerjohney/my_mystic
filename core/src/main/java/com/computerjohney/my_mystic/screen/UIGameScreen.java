@@ -13,6 +13,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -39,7 +41,9 @@ import com.computerjohney.my_mystic.system.AnimationSystem;
 import com.computerjohney.my_mystic.system.ControllerSystem;
 import com.computerjohney.my_mystic.system.FacingSystem;
 import com.computerjohney.my_mystic.system.FsmSystem;
-import com.computerjohney.my_mystic.system.MoveSystem;
+import com.computerjohney.my_mystic.system.PhysicMoveSystem;
+import com.computerjohney.my_mystic.system.PhysicDebugRenderSystem;
+import com.computerjohney.my_mystic.system.PhysicSystem;
 import com.computerjohney.my_mystic.system.RenderSystem;
 import com.computerjohney.my_mystic.tiled.TiledAshleyConfigurator;
 import com.computerjohney.my_mystic.tiled.TiledService;
@@ -68,28 +72,36 @@ public class UIGameScreen extends ScreenAdapter {
     //private final Batch uiBatch;
     //private final Skin skin;
     private final Stage uiStage;
+    private final World physicWorld;
 
 
     public UIGameScreen(GdxGame game) {
         this.game = game;
-
         //this.batch = game.getBatch();
 //        this.assetService = game.getAssetService();
 //        this.viewport = game.getViewport();
 //        this.camera = game.getCamera();
-        this.tiledService = new TiledService(game.getAssetService());
+
         this.engine = new Engine();
-        this.tiledAshleyConfigurator = new TiledAshleyConfigurator(this.engine, game.getAssetService());
+        this.physicWorld = new World(Vector2.Zero, true);
+        this.physicWorld.setAutoClearForces(false);  // cleared after step calls in step time loop
+        this.tiledService = new TiledService(game.getAssetService(),physicWorld);
+        this.tiledAshleyConfigurator = new TiledAshleyConfigurator(this.engine, game.getAssetService(), physicWorld);
         this.keyboardController = new KeyboardController(GameControllerState.class, engine);
+
 
         // 1st system executed for every...
         this.engine.addSystem(new ControllerSystem(game));
-        this.engine.addSystem(new MoveSystem());
+        this.engine.addSystem(new PhysicMoveSystem());
         // add systems as needed eg. moveSystem, animationSystem, heal, damage etc.
         this.engine.addSystem(new FsmSystem());
         this.engine.addSystem(new FacingSystem());
+        this.engine.addSystem(new PhysicSystem(physicWorld, 1/60f));        // our fixed time step!
         this.engine.addSystem(new AnimationSystem(game.getAssetService()));
-        this.engine.addSystem(new RenderSystem(game.getBatch(), game.getViewport(), game.getCamera()));
+        this.engine.addSystem(new RenderSystem(game.getBatch(), game.getViewport(), game.getCamera()));     // sets viewport.apply
+        // that updates current game view
+        // this must be after Render... expect viewport applied correctly...
+        this.engine.addSystem(new PhysicDebugRenderSystem(physicWorld, game.getCamera()));
 
 //        hudStage = new Stage(new FitViewport(200, 200));
 //        Skin skin = new Skin(Gdx.files.internal("assets/my_maps2/ui/skin.json")); // Load your UI skin
@@ -120,12 +132,16 @@ public class UIGameScreen extends ScreenAdapter {
         game.setInputProcessors(keyboardController, uiStage);
         keyboardController.setActiveState(GameControllerState.class);
 
+        // use the consumers...
         // now setMap is consumer
         Consumer<TiledMap> renderConsumer = this.engine.getSystem(RenderSystem.class)::setMap;
         this.tiledService.setMapChangeConsumer(renderConsumer);
         // later can add to renderConsumer with .andThen
 
         this.tiledService.setLoadObjectConsumer(this.tiledAshleyConfigurator::onLoadObject);
+        this.tiledService.setLoadTileConsumer(tiledAshleyConfigurator::onLoadTile);
+
+
 
         TiledMap tiledMap = this.tiledService.loadMap(MapAsset.MAIN);
         this.tiledService.setMap(tiledMap);
@@ -142,13 +158,14 @@ public class UIGameScreen extends ScreenAdapter {
         float xOffset = 450;
         float yOffset = 90;
 
-
         Skin buttonSkin = new Skin(Gdx.files.internal("my_maps2/buttons/buttons.json"));
 
         ImageButton image_button_left = new ImageButton(buttonSkin.get("button_left-style", ImageButton.ImageButtonStyle.class));
         ImageButton image_button_right = new ImageButton(buttonSkin.get("button_right-style", ImageButton.ImageButtonStyle.class));
         ImageButton image_button_up = new ImageButton(buttonSkin.get("button_up-style", ImageButton.ImageButtonStyle.class));
         ImageButton image_button_down = new ImageButton(buttonSkin.get("button_down-style", ImageButton.ImageButtonStyle.class));
+
+        // think its meant to work by new screen with table filling screen
 
         Table table1 = new Table();
         Table table2 = new Table();
@@ -249,13 +266,6 @@ public class UIGameScreen extends ScreenAdapter {
             });
         }
 
-        // Add the Image actor to the stage
-//        uiStage.addActor(image_button_left);
-//        uiStage.addActor(image_button_right);
-//        uiStage.addActor(image_button_up);
-//        uiStage.addActor(image_button_down);
-
-
 
     }
 
@@ -290,7 +300,7 @@ public class UIGameScreen extends ScreenAdapter {
                 disposableSystem.dispose();
             }
         }
-
+        this.physicWorld.dispose();
     }
 
 
