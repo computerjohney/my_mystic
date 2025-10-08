@@ -26,9 +26,10 @@
 182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182,182
 </data>
  </layer>
- <objectgroup id="2" name="objects" visible="0">
+ <objectgroup id="2" name="objects">
   <object id="1" name="Player" type="Player" gid="195" x="52.5435" y="281.035" width="32" height="32">
    <properties>
+    <property name="camFollow" type="bool" value="true"/>
     <property name="controller" type="bool" value="true"/>
    </properties>
   </object>

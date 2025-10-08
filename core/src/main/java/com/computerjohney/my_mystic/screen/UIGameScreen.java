@@ -38,6 +38,7 @@ import com.computerjohney.my_mystic.input.ControllerState;
 import com.computerjohney.my_mystic.input.GameControllerState;
 import com.computerjohney.my_mystic.input.KeyboardController;
 import com.computerjohney.my_mystic.system.AnimationSystem;
+import com.computerjohney.my_mystic.system.CameraSystem;
 import com.computerjohney.my_mystic.system.ControllerSystem;
 import com.computerjohney.my_mystic.system.FacingSystem;
 import com.computerjohney.my_mystic.system.FsmSystem;
@@ -99,6 +100,7 @@ public class UIGameScreen extends ScreenAdapter {
         this.engine.addSystem(new FacingSystem());
         this.engine.addSystem(new PhysicSystem(physicWorld, 1/60f));        // our fixed time step!
         this.engine.addSystem(new AnimationSystem(game.getAssetService()));
+        this.engine.addSystem(new CameraSystem(game.getCamera()));
         this.engine.addSystem(new RenderSystem(game.getBatch(), game.getViewport(), game.getCamera()));     // sets viewport.apply
         // that updates current game view
         // this must be after Render... expect viewport applied correctly...
@@ -118,6 +120,9 @@ public class UIGameScreen extends ScreenAdapter {
         //this.stage = new Stage(uiViewport, game.getBatch());
         this.uiStage = new Stage(uiViewport, game.getBatch());
         //Gdx.input.setInputProcessor(uiStage); // Essential to process input
+
+        // camera debuggin use this zoom...
+        //game.getCamera().zoom = 2f;
     }
 
     @Override
@@ -136,13 +141,12 @@ public class UIGameScreen extends ScreenAdapter {
         // use the consumers...
         // now setMap is consumer
         Consumer<TiledMap> renderConsumer = this.engine.getSystem(RenderSystem.class)::setMap;
-        this.tiledService.setMapChangeConsumer(renderConsumer);
+        Consumer<TiledMap> cameraConsumer = this.engine.getSystem(CameraSystem.class)::setMap;
+        this.tiledService.setMapChangeConsumer(renderConsumer.andThen(cameraConsumer));
         // later can add to renderConsumer with .andThen
 
         this.tiledService.setLoadObjectConsumer(this.tiledAshleyConfigurator::onLoadObject);
         this.tiledService.setLoadTileConsumer(tiledAshleyConfigurator::onLoadTile);
-
-
 
         TiledMap tiledMap = this.tiledService.loadMap(MapAsset.MAIN);
         this.tiledService.setMap(tiledMap);

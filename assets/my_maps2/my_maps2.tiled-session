@@ -32,7 +32,7 @@
         "objects.tsx"
     ],
     "project": "my_maps2.tiled-project",
-    "property.type": "float",
+    "property.type": "bool",
     "recentFiles": [
         "my_map.tmx",
         "objects.tsx",

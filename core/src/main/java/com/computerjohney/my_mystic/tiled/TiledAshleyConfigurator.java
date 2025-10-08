@@ -22,6 +22,7 @@ import com.computerjohney.my_mystic.GdxGame;
 import com.computerjohney.my_mystic.asset.AssetService;
 import com.computerjohney.my_mystic.asset.AtlasAsset;
 import com.computerjohney.my_mystic.component.Animation2D;
+import com.computerjohney.my_mystic.component.CameraFollow;
 import com.computerjohney.my_mystic.component.Controller;
 import com.computerjohney.my_mystic.component.Facing;
 import com.computerjohney.my_mystic.component.Fsm;
@@ -87,7 +88,7 @@ public class TiledAshleyConfigurator {
         addEntityAnimation(tile, entity);
         addEntityMove(tile, entity);
         addEntityController(tileMapObject, entity);
-//        addEntityCameraFollow(tileMapObject, entity);
+        addEntityCameraFollow(tileMapObject, entity);
 //        addEntityLife(tile, entity);
 //        addEntityPlayer(tileMapObject, entity);
 //        addEntityAttack(tile, entity);
@@ -97,6 +98,13 @@ public class TiledAshleyConfigurator {
     //    entity.add(new Tiled(tileMapObject));
 
         this.engine.addEntity(entity);
+    }
+
+    private void addEntityCameraFollow(TiledMapTileMapObject mapObject, Entity entity) {
+        boolean cameraFollow = mapObject.getProperties().get("camFollow", false, Boolean.class);
+        if (!cameraFollow) return;
+
+        entity.add(new CameraFollow());
     }
 
     private BodyDef.BodyType getObjectBodyType(TiledMapTile tile) {
