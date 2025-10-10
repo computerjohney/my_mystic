@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.computerjohney.my_mystic.GdxGame;
 import com.computerjohney.my_mystic.asset.AssetService;
@@ -56,6 +57,14 @@ public class TiledService {
             //
             // here really want to clean up entities, save state of entities remaining on current map etc.
             //
+
+            Array<Body> bodies = new Array<>();
+            physicWorld.getBodies(bodies);
+            for (Body body : bodies) {
+                if ("environment".equals(body.getUserData())) {
+                    physicWorld.destroyBody(body);
+                }
+            }
         }
         this.currentMap = map;
         // load tilemap objects

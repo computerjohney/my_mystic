@@ -33,6 +33,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.computerjohney.my_mystic.GdxGame;
 import com.computerjohney.my_mystic.asset.AssetService;
 import com.computerjohney.my_mystic.asset.MapAsset;
+import com.computerjohney.my_mystic.audio.AudioService;
 import com.computerjohney.my_mystic.input.Command;
 import com.computerjohney.my_mystic.input.ControllerState;
 import com.computerjohney.my_mystic.input.GameControllerState;
@@ -67,6 +68,8 @@ public class UIGameScreen extends ScreenAdapter {
     private final TiledAshleyConfigurator tiledAshleyConfigurator;
     private final KeyboardController keyboardController;
     private final World physicWorld;
+    private final AudioService audioService;
+
 
     //private final Stage stage;
     private final Viewport uiViewport;
@@ -90,7 +93,7 @@ public class UIGameScreen extends ScreenAdapter {
         this.tiledService = new TiledService(game.getAssetService(),physicWorld);
         this.tiledAshleyConfigurator = new TiledAshleyConfigurator(this.engine, game.getAssetService(), physicWorld);
         this.keyboardController = new KeyboardController(GameControllerState.class, engine);
-
+        this.audioService = game.getAudioService();
 
         // 1st system executed for every...
         this.engine.addSystem(new ControllerSystem(game));
@@ -142,7 +145,9 @@ public class UIGameScreen extends ScreenAdapter {
         // now setMap is consumer
         Consumer<TiledMap> renderConsumer = this.engine.getSystem(RenderSystem.class)::setMap;
         Consumer<TiledMap> cameraConsumer = this.engine.getSystem(CameraSystem.class)::setMap;
-        this.tiledService.setMapChangeConsumer(renderConsumer.andThen(cameraConsumer));
+        Consumer<TiledMap> audioConsumer = audioService::setMap;
+
+        this.tiledService.setMapChangeConsumer(renderConsumer.andThen(cameraConsumer).andThen(audioConsumer));
         // later can add to renderConsumer with .andThen
 
         this.tiledService.setLoadObjectConsumer(this.tiledAshleyConfigurator::onLoadObject);
@@ -289,7 +294,6 @@ public class UIGameScreen extends ScreenAdapter {
 //        }
 
         uiViewport.apply();
-
         uiStage.act(delta);
         uiStage.draw();
 
