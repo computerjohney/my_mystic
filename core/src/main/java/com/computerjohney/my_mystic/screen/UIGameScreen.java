@@ -70,13 +70,12 @@ public class UIGameScreen extends ScreenAdapter {
     private final World physicWorld;
     private final AudioService audioService;
 
-
-    //private final Stage stage;
     private final Viewport uiViewport;
     private final Camera uiCamera;
     //private final Batch uiBatch;
     //private final Skin skin;
     private final Stage uiStage;
+    //private final Stage stage;
 
 
 
@@ -130,7 +129,7 @@ public class UIGameScreen extends ScreenAdapter {
 
     @Override
     public void resize(int width, int height) {
-        uiViewport.update(width, height, true);
+        //uiViewport.update(width, height, true);
     }
 
 
@@ -288,7 +287,7 @@ public class UIGameScreen extends ScreenAdapter {
         delta = Math.min(delta, 1 / 30f);
         this.engine.update(delta);
 
-        // super simple approach...
+        //simple approach...
 //        if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
 //            System.out.println("W was just pressed");
 //        }
